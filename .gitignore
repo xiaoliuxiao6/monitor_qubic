@@ -1,2 +1,8 @@
 qubic.json
 push.sh
+build.sh
+
+monitor_qubic-linux-amd64*
+monitor_qubic-macos-amd64*
+monitor_qubic-macos-arm64*
+monitor_qubic-windows-amd64.exe*

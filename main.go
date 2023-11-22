@@ -23,35 +23,38 @@ import (
 )
 
 func main() {
-
-	// 解析钱包信息
-	var nodes []Node
-	if err := viper.UnmarshalKey("Nodes", &nodes); err != nil {
-		log.Fatalf("解析配置文件失败: %v", err)
-	}
-
-	// 通过钱包地址获取算力信息
-	for _, node := range nodes {
-		activeNodeCount, totalIts := getPerformance(node)
-		info := fmt.Sprintf("节点名称: %v, 节点总数: %v, 活跃节点数: %v, 总算力: %v",
-			node.Name, node.Count, activeNodeCount, totalIts)
-
-		// 如果节点数量 > 活跃节点数即是有节点掉线，发送微信告警
-		if node.Count > activeNodeCount {
-			SendWeixin("Qubic 有节点掉线：" + info)
-			log.Warnln(info)
-		} else {
-			log.Println(info)
+	for {
+		// 解析钱包信息
+		var nodes []Node
+		if err := viper.UnmarshalKey("Nodes", &nodes); err != nil {
+			log.Fatalf("解析配置文件失败: %v", err)
 		}
 
-		// 早8点和晚上8点发送存活告警
-		hostname, _ := os.Hostname()
-		if time.Now().Minute() < 10 {
-			if time.Now().Hour() == 8 || time.Now().Hour() == 20 {
-				SendWeixin(fmt.Sprintf("我正在监控 Qubic 的运行情况，正常运行中。。。", hostname))
+		// 通过钱包地址获取算力信息
+		for _, node := range nodes {
+			activeNodeCount, totalIts := getPerformance(node)
+			info := fmt.Sprintf("节点名称: %v, 节点总数: %v, 活跃节点数: %v, 总算力: %v",
+				node.Name, node.Count, activeNodeCount, totalIts)
+
+			// 如果节点数量 > 活跃节点数即是有节点掉线，发送微信告警
+			if node.Count > activeNodeCount {
+				SendWeixin("Qubic 有节点掉线：" + info)
+				log.Warnln(info)
+			} else {
+				log.Println(info)
+			}
+
+			// 早8点和晚上8点发送存活告警
+			hostname, _ := os.Hostname()
+			if time.Now().Minute() < 10 {
+				if time.Now().Hour() == 8 || time.Now().Hour() == 20 {
+					SendWeixin(fmt.Sprintf("我正在监控 Qubic 的运行情况，正常运行中。。。", hostname))
+				}
 			}
 		}
 
+		log.Println("休息一会。。。")
+		time.Sleep(60 * time.Second)
 	}
 }
 
