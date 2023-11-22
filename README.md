@@ -53,8 +53,8 @@
 @echo off
 
 :LOOP
-REM 检查是否存在 qli-Client.exe 进程
-tasklist | find /i "qli-Client.exe"
+REM 检查进程是否存在
+tasklist | find /i "monitor_qubic-windows-amd64.exe"
 
 REM 如果不存在，则启动你的脚本或命令
 if errorlevel 1 (
